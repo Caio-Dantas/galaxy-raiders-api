@@ -85,10 +85,13 @@ class GameEngine(
   }
 
   fun handleCollisions() {
+    this.field.tickExplosions()
     this.field.spaceObjects.forEachPair {
         (first, second) ->
       if (first.impacts(second)) {
-        first.collideWith(second, GameEngineConfig.coefficientRestitution)
+        if (first.type == "Asteroid" && second.type == "Missile") this.field.handleExplosion(first)
+        else if (first.type == "Missile" && second.type == "Asteroid") this.field.handleExplosion(second)
+        else first.collideWith(second, GameEngineConfig.coefficientRestitution)
       }
     }
   }
@@ -102,6 +105,7 @@ class GameEngine(
   fun trimSpaceObjects() {
     this.field.trimAsteroids()
     this.field.trimMissiles()
+    this.field.trimExplosions()
   }
 
   fun generateAsteroids() {

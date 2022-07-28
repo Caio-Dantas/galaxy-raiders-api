@@ -1,7 +1,11 @@
 @file:Suppress("UNUSED_PARAMETER") // <- REMOVE
+
 package galaxyraiders.core.physics
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import java.lang.Math.toDegrees
+import kotlin.math.atan2
+import kotlin.math.sqrt
 
 @JsonIgnoreProperties("unit", "normal", "degree", "magnitude")
 data class Vector2D(val dx: Double, val dy: Double) {
@@ -10,57 +14,57 @@ data class Vector2D(val dx: Double, val dy: Double) {
   }
 
   val magnitude: Double
-    get() = INVALID_DOUBLE
+    get() = sqrt(dx * dx + dy * dy)
 
   val radiant: Double
-    get() = INVALID_DOUBLE
+    get() = atan2(dy, dx)
 
   val degree: Double
-    get() = INVALID_DOUBLE
+    get() = toDegrees(radiant)
 
   val unit: Vector2D
-    get() = INVALID_VECTOR
+    get() = this / magnitude
 
   val normal: Vector2D
-    get() = INVALID_VECTOR
+    get() = Vector2D(dy, -dx).times(1 / magnitude)
 
   operator fun times(scalar: Double): Vector2D {
-    return INVALID_VECTOR
+    return Vector2D(dx * scalar, dy * scalar)
   }
 
   operator fun div(scalar: Double): Vector2D {
-    return INVALID_VECTOR
+    return Vector2D(dx / scalar, dy / scalar)
   }
 
   operator fun times(v: Vector2D): Double {
-    return INVALID_DOUBLE
+    return dx * v.dx + dy * v.dy
   }
 
   operator fun plus(v: Vector2D): Vector2D {
-    return INVALID_VECTOR
+    return Vector2D(dx + v.dx, dy + v.dy)
   }
 
   operator fun plus(p: Point2D): Point2D {
-    return INVALID_POINT
+    return p + this
   }
 
   operator fun unaryMinus(): Vector2D {
-    return INVALID_VECTOR
+    return Vector2D(-dx, -dy)
   }
 
   operator fun minus(v: Vector2D): Vector2D {
-    return INVALID_VECTOR
+    return this + (-v)
   }
 
   fun scalarProject(target: Vector2D): Double {
-    return INVALID_DOUBLE
+    return (this.times(target).div(target.magnitude))
   }
 
   fun vectorProject(target: Vector2D): Vector2D {
-    return INVALID_VECTOR
+    return (target.div(target.magnitude)).times(scalarProject(target))
   }
 }
 
 operator fun Double.times(v: Vector2D): Vector2D {
-  return INVALID_VECTOR
+  return v * this
 }

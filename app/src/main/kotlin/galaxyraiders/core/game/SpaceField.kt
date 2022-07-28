@@ -38,8 +38,34 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
   var asteroids: List<Asteroid> = emptyList()
     private set
 
+  var explosions: List<Explosion> = emptyList()
+    private set
+
   val spaceObjects: List<SpaceObject>
     get() = listOf(this.ship) + this.missiles + this.asteroids
+
+
+  fun tickExplosions() {
+    this.explosions.forEach { it.decreaseCountdown() }
+  }
+
+  fun trimExplosions() {
+    this.explosions = this.explosions.filter { it.countdown > 0 }
+  }
+
+  fun handleExplosion(obj: SpaceObject) {
+    this.explosions += createExplosionInPosition(obj)
+  }
+
+  fun createExplosionInPosition(element: SpaceObject): Explosion {
+    return Explosion(
+      initialPosition = element.center,
+      initialVelocity = Vector2D(dx = 0.0, dy = 0.0),
+      radius = 10.0,
+      mass = 1.0,
+      countdown = 5
+    )
+  }
 
   fun moveShip() {
     this.ship.move(boundaryX, boundaryY)
